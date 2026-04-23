@@ -14,16 +14,341 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      badges: {
+        Row: {
+          code: string
+          description: string | null
+          icon: string
+          id: string
+          title: string
+        }
+        Insert: {
+          code: string
+          description?: string | null
+          icon?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          code?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      daily_challenges: {
+        Row: {
+          bonus_coins: number
+          bonus_xp: number
+          challenge_date: string
+          created_at: string
+          id: string
+          question_ids: string[]
+        }
+        Insert: {
+          bonus_coins?: number
+          bonus_xp?: number
+          challenge_date?: string
+          created_at?: string
+          id?: string
+          question_ids: string[]
+        }
+        Update: {
+          bonus_coins?: number
+          bonus_xp?: number
+          challenge_date?: string
+          created_at?: string
+          id?: string
+          question_ids?: string[]
+        }
+        Relationships: []
+      }
+      daily_completions: {
+        Row: {
+          challenge_id: string
+          completed_at: string
+          id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string
+          id?: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string
+          id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_completions_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "daily_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      levels: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          subject_id: string
+          tier: Database["public"]["Enums"]["level_tier"]
+          title: string
+          unlock_coins: number
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          subject_id: string
+          tier: Database["public"]["Enums"]["level_tier"]
+          title: string
+          unlock_coins?: number
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          subject_id?: string
+          tier?: Database["public"]["Enums"]["level_tier"]
+          title?: string
+          unlock_coins?: number
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "levels_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          banned: boolean
+          coins: number
+          created_at: string
+          display_name: string
+          id: string
+          last_active_date: string | null
+          streak: number
+          xp: number
+        }
+        Insert: {
+          avatar_url?: string | null
+          banned?: boolean
+          coins?: number
+          created_at?: string
+          display_name?: string
+          id: string
+          last_active_date?: string | null
+          streak?: number
+          xp?: number
+        }
+        Update: {
+          avatar_url?: string | null
+          banned?: boolean
+          coins?: number
+          created_at?: string
+          display_name?: string
+          id?: string
+          last_active_date?: string | null
+          streak?: number
+          xp?: number
+        }
+        Relationships: []
+      }
+      progress: {
+        Row: {
+          completed: boolean
+          correct_count: number
+          id: string
+          level_id: string
+          played_at: string
+          score: number
+          total_questions: number
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          completed?: boolean
+          correct_count?: number
+          id?: string
+          level_id: string
+          played_at?: string
+          score?: number
+          total_questions?: number
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          completed?: boolean
+          correct_count?: number
+          id?: string
+          level_id?: string
+          played_at?: string
+          score?: number
+          total_questions?: number
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          explanation: string | null
+          id: string
+          level_id: string
+          options: Json
+          question: string
+          time_seconds: number
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          level_id: string
+          options: Json
+          question: string
+          time_seconds?: number
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          level_id?: string
+          options?: Json
+          question?: string
+          time_seconds?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          title: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          badge_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      level_tier: "Beginner" | "Intermediate" | "Advanced"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +475,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      level_tier: ["Beginner", "Intermediate", "Advanced"],
+    },
   },
 } as const
