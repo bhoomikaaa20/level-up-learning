@@ -81,7 +81,7 @@ export default function Leaderboard() {
 }
 
 function Row({ rank, name, value, suffix, highlight }: { rank: number; name: string; value: number; suffix: string; highlight?: boolean }) {
-  const medal = rank === 1 ? <Crown className="h-5 w-5 text-warning" /> : rank === 2 ? <Medal className="h-5 w-5 text-muted-foreground" /> : rank === 3 ? <Medal className="h-5 w-5 text-orange-400" /> : null;
+  const medal = rank === 1 ? <Crown className="h-5 w-5 text-warning" /> : rank === 2 ? <Medal className="h-5 w-5 text-muted-foreground" /> : rank === 3 ? <Medal className="h-5 w-5 text-secondary" /> : null;
   return (
     <div className={`flex items-center justify-between border-b border-border/50 px-5 py-3 last:border-b-0 ${highlight ? "bg-primary/10" : ""}`}>
       <div className="flex items-center gap-4">
