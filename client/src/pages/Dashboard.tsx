@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppHeader } from "@/components/AppHeader";
 import { Card } from "@/components/ui/card";
 import { Sparkles, Coins, Flame, Trophy, Target, Loader2 } from "lucide-react";
-
+import axios from "axios";
 interface Profile {
   display_name: string;
   xp: number;

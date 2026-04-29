@@ -22,7 +22,7 @@ interface ProfileBrief {
 }
 
 export function AppHeader() {
-  const { user, role, signOut } = useAuth();
+  const { user, signOut } = useAuth(); // ❌ removed role
   const [profile, setProfile] = useState<ProfileBrief | null>(null);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -86,7 +86,8 @@ export function AppHeader() {
             );
           })}
 
-          {role === "admin" && (
+          {/* ✅ FIX: use user.role */}
+          {user?.role === "admin" && (
             <Link
               to="/admin"
               className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${pathname.startsWith("/admin")

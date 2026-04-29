@@ -10,7 +10,7 @@ export function ProtectedRoute({
   children: ReactNode;
   requireAdmin?: boolean;
 }) {
-  const { user, role, loading } = useAuth();
+  const { user, loading } = useAuth(); //
   const location = useLocation();
 
   if (loading) {
@@ -20,7 +20,15 @@ export function ProtectedRoute({
       </div>
     );
   }
-  if (!user) return <Navigate to="/auth" state={{ from: location }} replace />;
-  if (requireAdmin && role !== "admin") return <Navigate to="/home" replace />;
+
+  if (!user) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // ✅ FIX: use user.role
+  if (requireAdmin && user.role !== "admin") {
+    return <Navigate to="/home" replace />;
+  }
+
   return <>{children}</>;
 }

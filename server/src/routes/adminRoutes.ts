@@ -1,9 +1,9 @@
 import express from "express";
 import {
     getAdminData,
-    addSubject,
+    saveSubject,
     deleteSubject,
-    addLevel,
+    saveLevel,
     deleteLevel
 } from "../controllers/adminController";
 import { protect } from "../middleware/authMiddleware";
@@ -24,9 +24,9 @@ const router = express.Router();
 
 router.get("/", protect, getAdminData);
 
-router.post("/subject", protect, addSubject);
+router.post("/subject", protect, saveSubject);
 router.delete("/subject/:id", protect, deleteSubject);
-router.post("/level", protect, addLevel);
+router.post("/level", protect, saveLevel);
 router.delete("/level/:id", protect, deleteLevel);
 router.get("/stats", protect, getAdminStats);
 router.get("/top-players", protect, getTopPlayers);

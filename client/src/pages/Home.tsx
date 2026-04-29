@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { AppHeader } from "@/components/AppHeader";
 import { Card } from "@/components/ui/card";
 import { Loader2, ChevronRight } from "lucide-react";
-
+import axios from "axios";
 interface Subject {
-  id: string;
+  _id: string;
   title: string;
   description: string | null;
   icon: string;
@@ -44,7 +44,7 @@ export default function Home() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {subjects.map((s, i) => (
-              <Link key={s.id} to={`/subject/${s.id}`}>
+              <Link key={s._id} to={`/subject/${s._id}`}>
                 <Card className="arcade-card group relative overflow-hidden p-6 transition-all hover:scale-[1.02] hover:glow-primary">
                   <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-arcade opacity-10 blur-2xl transition-opacity group-hover:opacity-20" />
                   <div className="text-5xl mb-4 animate-float" style={{ animationDelay: `${i * 0.2}s` }}>{s.icon}</div>

@@ -17,10 +17,17 @@ export const getAdminData = async (req: Request, res: Response) => {
     }
 };
 
-// ADD SUBJECT
-export const addSubject = async (req: Request, res: Response) => {
+// SAVE SUBJECT (ADD/UPDATE)
+export const saveSubject = async (req: Request, res: Response) => {
     try {
-        const subject = await Subject.create(req.body);
+        const { id, ...data } = req.body;
+
+        if (id) {
+            const updated = await Subject.findByIdAndUpdate(id, data, { new: true });
+            return res.json(updated);
+        }
+
+        const subject = await Subject.create(data);
         res.json(subject);
     } catch (err: any) {
         res.status(500).json({ message: err.message });
@@ -37,10 +44,17 @@ export const deleteSubject = async (req: Request, res: Response) => {
     }
 };
 
-// ADD LEVEL
-export const addLevel = async (req: Request, res: Response) => {
+// SAVE LEVEL (ADD/UPDATE)
+export const saveLevel = async (req: Request, res: Response) => {
     try {
-        const level = await Level.create(req.body);
+        const { id, ...data } = req.body;
+
+        if (id) {
+            const updated = await Level.findByIdAndUpdate(id, data, { new: true });
+            return res.json(updated);
+        }
+
+        const level = await Level.create(data);
         res.json(level);
     } catch (err: any) {
         res.status(500).json({ message: err.message });

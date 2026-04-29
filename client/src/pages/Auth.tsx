@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import axios from "axios"; // ✅ added
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +19,7 @@ const signupSchema = z.object({
 const loginSchema = signupSchema.pick({ email: true, password: true });
 
 export default function Auth() {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser } = useAuth(); // ✅ added setUser
   const navigate = useNavigate();
 
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -44,7 +44,6 @@ export default function Auth() {
           return;
         }
 
-        // ✅ CALL YOUR BACKEND
         await axios.post("http://localhost:5000/api/auth/signup", {
           email: parsed.data.email,
           password: parsed.data.password,
@@ -52,7 +51,7 @@ export default function Auth() {
         });
 
         toast.success("Account created! Please login.");
-        setMode("login"); // switch to login after signup
+        setMode("login");
 
       } else {
         const parsed = loginSchema.safeParse({ email, password });
@@ -61,19 +60,22 @@ export default function Auth() {
           return;
         }
 
-        // ✅ LOGIN API
         const res = await axios.post("http://localhost:5000/api/auth/login", {
           email: parsed.data.email,
           password: parsed.data.password,
         });
 
-        // ✅ STORE TOKEN
+        // ✅ store token
         localStorage.setItem("token", res.data.token);
 
-        toast.success("Welcome back!");
-        navigate("/home"); // redirect
+        // ✅ FIX: update auth state immediately
+        setUser(res.data.user);
 
+        toast.success("Welcome back!");
+
+        navigate("/home"); // instant redirect (no refresh needed)
       }
+
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Something went wrong");
     } finally {
