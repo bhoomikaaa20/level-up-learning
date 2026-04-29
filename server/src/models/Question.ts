@@ -16,6 +16,11 @@ const questionSchema = new Schema<IQuestion>({
     explanation: { type: String },
 
     // ✅ FIXED
+    subject_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Subject",
+        required: true
+    },
     level_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Level",

@@ -17,6 +17,7 @@ import { Plus, Trash2, Edit } from "lucide-react";
 import { toast } from "sonner";
 
 const empty = {
+  subject_id: "",
   level_id: "",
   question: "",
   options: ["", "", "", ""],
@@ -26,7 +27,9 @@ const empty = {
 };
 
 export default function AdminQuestions() {
+  const [subjects, setSubjects] = useState<any[]>([]);
   const [levels, setLevels] = useState<any[]>([]);
+  const [filterSubject, setFilterSubject] = useState("all");
   const [filterLevel, setFilterLevel] = useState("all");
   const [questions, setQuestions] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -35,32 +38,39 @@ export default function AdminQuestions() {
 
   const token = localStorage.getItem("token");
 
-  const load = async () => {
+  useEffect(() => {
+    const fetchDropdownData = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/admin", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSubjects(res.data.subjects);
+        setLevels(res.data.levels);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchDropdownData();
+  }, []);
+
+  const loadQuestions = async () => {
     try {
-      const [l, q] = await Promise.all([
-        axios.get("http://localhost:5000/api/admin/levels", {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get("http://localhost:5000/api/admin/questions", {
-          params: { levelId: filterLevel },
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      setLevels(l.data);
+      const q = await axios.get("http://localhost:5000/api/admin/questions", {
+        params: { subjectId: filterSubject, levelId: filterLevel },
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setQuestions(q.data);
-
     } catch (err) {
       console.error(err);
     }
   };
 
-  useEffect(() => { load(); }, [filterLevel]);
+  useEffect(() => { loadQuestions(); }, [filterSubject, filterLevel]);
 
   const save = async () => {
     const opts = form.options.map((o: string) => o.trim()).filter(Boolean);
 
-    if (!form.level_id || !form.question || opts.length < 2 || !form.correct_answer) {
+    if (!form.subject_id || !form.level_id || !form.question || opts.length < 2 || !form.correct_answer) {
       return toast.error("Fill all required fields");
     }
 
@@ -79,7 +89,7 @@ export default function AdminQuestions() {
     setOpen(false);
     setEditing(null);
     setForm(empty);
-    load();
+    loadQuestions();
   };
 
   const del = async (id: string) => {
@@ -87,7 +97,7 @@ export default function AdminQuestions() {
       `http://localhost:5000/api/admin/question/${id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    load();
+    loadQuestions();
   };
 
   const startEdit = (q: any) => {
@@ -97,6 +107,7 @@ export default function AdminQuestions() {
     while (opts.length < 4) opts.push("");
 
     setForm({
+      subject_id: q.subject_id,
       level_id: q.level_id,
       question: q.question,
       options: opts,
@@ -114,19 +125,34 @@ export default function AdminQuestions() {
     setForm({ ...form, options: newOpts });
   };
 
+  const availableLevelsForFilter = filterSubject === "all" ? levels : levels.filter(l => l.subject_id === filterSubject);
+  const availableLevelsForForm = form.subject_id ? levels.filter(l => l.subject_id === form.subject_id) : [];
+
   return (
     <Card className="arcade-card p-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <h3 className="text-xl font-bold">Questions</h3>
         
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <Select value={filterSubject} onValueChange={(v) => { setFilterSubject(v); setFilterLevel("all"); }}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="All Subjects" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Subjects</SelectItem>
+              {subjects.map(s => (
+                <SelectItem key={s._id} value={s._id}>{s.title}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Select value={filterLevel} onValueChange={setFilterLevel}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Filter by Level" />
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="All Levels" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Levels</SelectItem>
-              {levels.map(l => (
+              {availableLevelsForFilter.map(l => (
                 <SelectItem key={l._id} value={l._id}>{l.title}</SelectItem>
               ))}
             </SelectContent>
@@ -148,18 +174,34 @@ export default function AdminQuestions() {
               </DialogHeader>
               
               <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label>Level</Label>
-                  <Select value={form.level_id} onValueChange={v => setForm({ ...form, level_id: v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {levels.map(l => (
-                        <SelectItem key={l._id} value={l._id}>{l.title}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Subject</Label>
+                    <Select value={form.subject_id} onValueChange={v => setForm({ ...form, subject_id: v, level_id: "" })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map(s => (
+                          <SelectItem key={s._id} value={s._id}>{s.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Level</Label>
+                    <Select value={form.level_id} onValueChange={v => setForm({ ...form, level_id: v })} disabled={!form.subject_id}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableLevelsForForm.map(l => (
+                          <SelectItem key={l._id} value={l._id}>{l.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -234,11 +276,15 @@ export default function AdminQuestions() {
       ) : (
         <div className="space-y-3">
           {questions.map((q) => {
+            const subjectTitle = subjects.find(s => s._id === q.subject_id)?.title;
             const levelTitle = levels.find(l => l._id === q.level_id)?.title;
             return (
               <div key={q._id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg hover:bg-muted/50 gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 bg-accent/10 text-accent text-xs rounded-full font-medium">
+                      {subjectTitle || 'Unknown Subject'}
+                    </span>
                     <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full font-medium">
                       {levelTitle || 'Unknown Level'}
                     </span>

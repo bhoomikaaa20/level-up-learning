@@ -128,9 +128,12 @@ export const getLevels = async (req: Request, res: Response) => {
 // GET QUESTIONS (OPTIONAL FILTER)
 export const getQuestions = async (req: Request, res: Response) => {
     try {
-        const { levelId } = req.query;
+        const { subjectId, levelId } = req.query;
 
         let query: any = {};
+        if (subjectId && subjectId !== "all") {
+            query.subject_id = subjectId;
+        }
         if (levelId && levelId !== "all") {
             query.level_id = levelId;
         }
